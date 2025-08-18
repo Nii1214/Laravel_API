@@ -29,7 +29,7 @@ ToDoリストを管理するためのRESTful API。
 - **概要**: 登録されているToDoを全件取得する（ページネーション対応）
 - **認証**: 必須
 - **クエリパラメータ**:
-  - `page` (optional): ページ番号（デフォルト: 1）
+  - `page` (optional): ページ番号（デフォルト: 1, 最小: 1）
   - `limit` (optional): 1ページあたりの件数（デフォルト: 20, 最大: 100）
   - `completed` (optional): 完了状態でフィルタ（true/false）
   - `sort` (optional): ソート項目（created_at, updated_at, title）
@@ -55,8 +55,8 @@ ToDoリストを管理するためのRESTful API。
     "total_pages": 1
   },
   "links": {
-    "first": "/api/todos?page=1",
-    "last": "/api/todos?page=1",
+    "first": "https://api.example.com/v1/api/todos?page=1",
+    "last": "https://api.example.com/v1/api/todos?page=1",
     "prev": null,
     "next": null
   }
@@ -72,6 +72,7 @@ ToDoリストを管理するためのRESTful API。
 - **ステータスコード**
   - 200 OK
   - 401 Unauthorized（認証エラー）
+  - 403 Forbidden（認可エラー）
   - 429 Too Many Requests（レート制限超過）
 
 ### 3-2.ToDo詳細取得
@@ -102,6 +103,7 @@ ToDoリストを管理するためのRESTful API。
 - **ステータスコード**
   - 200 OK
   - 401 Unauthorized（認証エラー）
+  - 403 Forbidden（認可エラー）
   - 404 Not Found（存在しない場合）
 
 ### 3-3.ToDo作成
@@ -150,7 +152,20 @@ ToDoリストを管理するためのRESTful API。
   - `id` (required): ToDoのID（整数）
 - **Content-Type**: `application/json`
 
-- **リクエストボディ**
+#### PUT（全置換）
+- **概要**: リソース全体を新しい値で置き換える
+- **リクエストボディ**: すべてのフィールドを含む必要がある
+```json
+{
+  "title": "買い物に行く",
+  "description": "牛乳と卵を買う",
+  "completed": true
+}
+```
+
+#### PATCH（部分更新）
+- **概要**: 指定されたフィールドのみを更新する
+- **リクエストボディ**: 更新したいフィールドのみを含む
 ```json
 {
   "completed": true
@@ -176,6 +191,7 @@ ToDoリストを管理するためのRESTful API。
   - 200 OK
   - 400 Bad Request（リクエスト形式エラー）
   - 401 Unauthorized（認証エラー）
+  - 403 Forbidden（認可エラー）
   - 404 Not Found（存在しない場合）
   - 422 Unprocessable Entity（バリデーションエラー）
 
@@ -198,14 +214,29 @@ ToDoリストを管理するためのRESTful API。
 - **ステータスコード**
   - 200 OK
   - 401 Unauthorized（認証エラー）
+  - 403 Forbidden（認可エラー）
   - 404 Not Found（存在しない場合）
 
 ## 4.エラーレスポンス
 
-### 4-1.バリデーションエラー（422）
+### 4-1.共通エラーレスポンス形式
+すべてのエラーレスポンスは以下の統一された形式を使用します：
+
+```json
+{
+  "message": "エラーメッセージ",
+  "error": "ERROR_CODE",
+  "errors": {
+    "フィールド名": ["詳細エラーメッセージ"]
+  }
+}
+```
+
+### 4-2.バリデーションエラー（422）
 ```json
 {
   "message": "The given data was invalid.",
+  "error": "VALIDATION_ERROR",
   "errors": {
     "title": [
       "The title field is required."
@@ -217,7 +248,7 @@ ToDoリストを管理するためのRESTful API。
 }
 ```
 
-### 4-2.認証エラー（401）
+### 4-3.認証エラー（401）
 ```json
 {
   "message": "Unauthenticated.",
@@ -225,7 +256,15 @@ ToDoリストを管理するためのRESTful API。
 }
 ```
 
-### 4-3.レート制限エラー（429）
+### 4-4.認可エラー（403）
+```json
+{
+  "message": "You do not have permission to access this resource.",
+  "error": "FORBIDDEN"
+}
+```
+
+### 4-5.レート制限エラー（429）
 ```json
 {
   "message": "Too many requests.",
@@ -234,7 +273,7 @@ ToDoリストを管理するためのRESTful API。
 }
 ```
 
-### 4-4.サーバーエラー（500）
+### 4-6.サーバーエラー（500）
 ```json
 {
   "message": "Internal server error.",
@@ -265,17 +304,32 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
 - ユーザーは自分のToDoのみアクセス可能
 - 他のユーザーのToDoへのアクセスは403 Forbidden
 
-## 7.レート制限
+## 7.ページネーション仕様
+
+### 7-1.基本仕様
+- **デフォルトページサイズ**: 20件
+- **最大ページサイズ**: 100件
+- **最小ページ番号**: 1
+
+### 7-2.ページ範囲外の処理
+- 存在しないページ番号を指定した場合、空のデータ配列を返却
+- エラーは発生しない（200 OKで空配列を返却）
+
+### 7-3.リンク形式
+- すべてのリンクは完全なURL形式（`https://api.example.com/v1/api/todos?page=1`）
+- 相対パスは使用しない
+
+## 8.レート制限
 - **制限**: 1分間に100リクエスト
 - **ヘッダー**: `X-RateLimit-*`で制限情報を返却
 - **超過時**: 429 Too Many Requests
 
-## 8.キャッシュ戦略
+## 9.キャッシュ戦略
 - **GET /api/todos**: 5分間キャッシュ
 - **GET /api/todos/{id}**: 10分間キャッシュ
 - **POST/PUT/DELETE**: キャッシュ無効化
 
-## 9.セキュリティ
+## 10.セキュリティ
 - HTTPS通信必須
 - CORS設定による適切なオリジン制限
 - SQLインジェクション対策
