@@ -9,6 +9,8 @@ services:
         value: production
       - key: APP_DEBUG
         value: false
+      - key: APP_KEY
+        fromSecret: APP_KEY # Render の Secret に事前に生成したキーを設定
       - key: DB_CONNECTION
         value: pgsql
       - key: DB_HOST

@@ -7,33 +7,28 @@ RUN apt-get update && apt-get install -y \
     && docker-php-ext-install pdo_pgsql mbstring exif pcntl bcmath gd zip \
     && rm -rf /var/lib/apt/lists/*
 
-# Composer をコピー
+# Composer
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
 # 作業ディレクトリ
 WORKDIR /var/www
 
-# 先に .env をコピー（Render の envVars で上書き可能）
+# Laravel が書き込むディレクトリの権限設定（先に）
+RUN mkdir -p /var/www/storage /var/www/bootstrap/cache \
+    && chown -R www-data:www-data /var/www/storage /var/www/bootstrap/cache \
+    && chmod -R 755 /var/www/storage /var/www/bootstrap/cache
+
+# .env をコピー（APP_KEY は Render の環境変数で上書き）
 COPY .env.example .env
 
-# composer.json と composer.lock をコピーして依存関係インストール（スクリプトはスキップ）
+# composer.json と composer.lock をコピーして依存関係インストール
 COPY composer.json composer.lock ./
 RUN composer install --no-dev --optimize-autoloader --no-interaction --no-scripts
 
-# APP_KEY 生成（本番用の.env に反映される）
-RUN php artisan key:generate
-
-# package:discover を明示的に実行
-RUN php artisan package:discover --ansi
-
-# ソースコードをコピー
+# ソースコードコピー
 COPY . .
 
-# Laravel が書き込むディレクトリの権限設定
-RUN chown -R www-data:www-data /var/www/storage /var/www/bootstrap/cache \
-    && chmod -R 755 /var/www/storage /var/www/bootstrap/cache
-
-# 環境変数
+# 環境変数（Docker ビルド内用。Render の envVars で上書きされます）
 ENV APP_ENV=production
 ENV APP_DEBUG=false
 
