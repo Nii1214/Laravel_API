@@ -2,8 +2,8 @@ services:
   # Laravel API サービス
   - type: web
     name: laravel-api
-    plan: hobby       # ← 無料枠
-    runtime: php      # ← 必須
+    plan: free
+    runtime: php82
     buildCommand: |
       composer install --no-dev --optimize-autoloader
       php artisan key:generate
@@ -54,4 +54,4 @@ databases:
   - name: laravel-db
     databaseName: laravel_db
     user: laravel_user
-    plan: hobby       # ← 無料枠
+    plan: free
