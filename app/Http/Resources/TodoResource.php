@@ -8,7 +8,7 @@ use Illuminate\Http\Resources\Json\JsonResource;
 class TodoResource extends JsonResource
 {
     /**
-     * Transform the resource into an array.
+     * 単一のTodoデータを配列形式に変換
      *
      * @return array<string, mixed>
      */
@@ -18,10 +18,9 @@ class TodoResource extends JsonResource
             'id' => $this->id,
             'title' => $this->title,
             'description' => $this->description,
-            'completed' => (bool) $this->completed,
-            'user_id' => $this->user_id,
-            'created_at' => $this->created_at->toDateTimeString(),
-            'updated_at' => $this->updated_at->toDateTimeString(),
+            'completed' => $this->completed,
+            'created_at' => $this->created_at->toISOString(),
+            'updated_at' => $this->updated_at->toISOString(),
         ];
     }
 }
