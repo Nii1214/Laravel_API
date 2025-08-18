@@ -38,7 +38,7 @@ ENV APP_ENV=production
 ENV APP_DEBUG=false
 
 # ポートの公開
-EXPOSE $PORT
+EXPOSE 8080
 
 # PHP built-in serverの起動（Render用）
-CMD php -S 0.0.0.0:$PORT -t public 
+CMD php -S 0.0.0.0:8080 -t public 
