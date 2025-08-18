@@ -1,63 +1,51 @@
+# エンジニアの業務効率化を支援するAll-in-Oneツール『デブリオ　Devrio』
+社内向けの業務アプリケーションをイメージして作成しました。
+生成AIの台頭でさまざまなツールを使用することが考えられるため、各ツールの知見を集約して管理できるアプリケーションを目指しています。
+将来的にはマネジメント思考のあるエンジニアを増やしたいと思い、WBSに関するデータも集約したいと考えており、このアプリでプロジェクト運営が完結できるようなアプリを目指しています。
 
-## Docker環境での実行
+## 主要機能
+### グループ向けの機能
+- wikiの作成・閲覧
+- タスク管理機能
+- 閲覧・編集権限の設定
 
-このプロジェクトはDockerを使用して簡単にセットアップできます。
+### 個人向け機能
+- ToDoリスト
 
-### 前提条件
-- Docker
-- Docker Compose
-
-### セットアップ手順
-
-```bash
-# コンテナをビルドして起動
-docker-compose build
-docker-compose up -d
-
-# Laravelの初期設定
-docker-compose exec app composer install
-docker-compose exec app php artisan key:generate
-docker-compose exec app php artisan migrate
-docker-compose exec app php artisan storage:link
+## ディレクトリ構成
 ```
-   ```bash
-   # コンテナをビルドして起動
-   docker-compose build
-   docker-compose up -d
-   
-   # Laravelの初期設定
-   docker-compose exec app composer install
-   docker-compose exec app php artisan key:generate
-   docker-compose exec app php artisan migrate
-   docker-compose exec app php artisan storage:link
-   ```
+app/
+ ├─ Http/
+ │   ├─ Controllers/   ← APIの処理を行うクラス
+ │   ├─ Requests/      ← リクエストのバリデーション定義
+ │   └─ Resources/     ← APIレスポンス整形用クラス
+ └─ Models/            ← DBテーブルと対応するモデル
+database/
+ ├─ migrations/        ← テーブル構造定義
+ ├─ factories/         ← テストデータ生成用
+ └─ seeders/           ← 初期データ投入用
+routes/
+ └─ api.php            ← API専用ルーティング設定
+```
+## 認証・認可
+Laravel Sanctumを使用。
+
+# 開発者用README
 
 ### アクセスURL
 - **Laravel アプリケーション**: http://localhost:8000
 - **PhpMyAdmin**: http://localhost:8080
 
-### データベース情報
-- **Host**: localhost
-- **Port**: 3306
-- **Database**: laravel_db
-- **Username**: laravel_user
-- **Password**: laravel_password
-
-### 便利なコマンド
 ```bash
-# コンテナの起動
-docker-compose up -d
+# 全テスト実行
+php artisan test
 
-# コンテナの停止
-docker-compose down
+# 機能テストのみ
+php artisan test --testsuite=Feature
 
-# ログの表示
-docker-compose logs -f
+# 単体テストのみ
+php artisan test --testsuite=Unit
 
-# アプリコンテナに入る
-docker-compose exec app bash
-
-# データベースコンテナに入る
-docker-compose exec mysql mysql -u laravel_user -p laravel_db
+# 特定のテスト
+php artisan test --filter test_todo_index_returns_paginated_todos
 ```
-
