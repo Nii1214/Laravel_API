@@ -2,7 +2,7 @@ services:
   - type: web
     name: laravel-api
     plan: free
-    dockerfilePath: Dockerfile
+    dockerfilePath: ./Dockerfile 
     startCommand: php -S 0.0.0.0:$PORT -t public
     envVars:
       - key: APP_ENV
