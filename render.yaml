@@ -2,7 +2,7 @@ services:
   # Laravel API サービス
   - type: web
     name: laravel-api
-    runtime: php
+    env: php
     plan: starter
     buildCommand: |
       composer install --no-dev --optimize-autoloader
