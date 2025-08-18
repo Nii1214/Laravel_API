@@ -17,13 +17,12 @@ WORKDIR /var/www
 COPY composer.json composer.lock ./
 RUN composer install --no-dev --optimize-autoloader --no-interaction
 
-# ソースコードコピー
-COPY . .
-
-# .env コピー & APP_KEY 生成
-# 本番では Render の envVars で上書き可能
+# .env コピー & APP_KEY 生成（本番用は Render の envVars で上書き可能）
 COPY .env.example .env
 RUN php artisan key:generate
+
+# ソースコードをコピー
+COPY . .
 
 # Laravel が書き込むディレクトリの権限設定
 RUN chown -R www-data:www-data /var/www/storage /var/www/bootstrap/cache \

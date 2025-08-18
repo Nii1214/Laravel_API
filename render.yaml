@@ -9,14 +9,6 @@ services:
         value: production
       - key: APP_DEBUG
         value: false
-      - key: LOG_CHANNEL
-        value: stack
-      - key: CACHE_DRIVER
-        value: file
-      - key: SESSION_DRIVER
-        value: file
-      - key: QUEUE_CONNECTION
-        value: sync
       - key: DB_CONNECTION
         value: pgsql
       - key: DB_HOST
