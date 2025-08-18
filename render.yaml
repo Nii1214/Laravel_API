@@ -1,18 +1,8 @@
 services:
-  # Laravel API サービス
   - type: web
     name: laravel-api
     plan: free
-    runtime: php81
-    buildCommand: |
-      composer install --no-dev --optimize-autoloader
-      php artisan key:generate
-      php artisan config:cache
-      php artisan route:cache
-      php artisan view:cache
-    startCommand: |
-      php artisan migrate --force || true
-      php -S 0.0.0.0:$PORT -t public
+    dockerfilePath: Dockerfile
     envVars:
       - key: APP_ENV
         value: production
@@ -50,7 +40,6 @@ services:
           property: password
 
 databases:
-  # PostgreSQL データベース
   - name: laravel-db
     databaseName: laravel_db
     user: laravel_user
