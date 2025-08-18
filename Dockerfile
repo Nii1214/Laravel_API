@@ -1,4 +1,4 @@
-# Render公式サンプルを参考にしたDockerfile
+# PHP 8.2 CLI ベース
 FROM php:8.2-cli
 
 # 必要なパッケージのインストール
@@ -10,14 +10,20 @@ RUN apt-get update && apt-get install -y \
 # Composer
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
+# 作業ディレクトリ
 WORKDIR /var/www
 
-# composer.json と composer.lock を先にコピーして依存関係をインストール
+# composer.json と composer.lock を先にコピーして依存関係インストール
 COPY composer.json composer.lock ./
-RUN composer install --no-dev --optimize-autoloader
+RUN composer install --no-dev --optimize-autoloader --no-interaction
 
-# ソースコードをコピー
+# ソースコードコピー
 COPY . .
+
+# .env コピー & APP_KEY 生成
+# 本番では Render の envVars で上書き可能
+COPY .env.example .env
+RUN php artisan key:generate
 
 # Laravel が書き込むディレクトリの権限設定
 RUN chown -R www-data:www-data /var/www/storage /var/www/bootstrap/cache \
@@ -27,7 +33,8 @@ RUN chown -R www-data:www-data /var/www/storage /var/www/bootstrap/cache \
 ENV APP_ENV=production
 ENV APP_DEBUG=false
 
-# ポートは固定
+# ポート
 EXPOSE 8000
 
+# サーバ起動
 CMD php -S 0.0.0.0:8000 -t public
