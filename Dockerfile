@@ -1,4 +1,5 @@
-FROM php:8.1-cli
+# Render公式サンプルを参考にしたDockerfile
+FROM php:8.2-cli
 
 # 必要なパッケージのインストール
 RUN apt-get update && apt-get install -y \
@@ -28,3 +29,5 @@ ENV APP_DEBUG=false
 
 # ポートは固定
 EXPOSE 8000
+
+CMD php -S 0.0.0.0:8000 -t public
