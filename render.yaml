@@ -2,7 +2,7 @@ services:
   # Laravel API サービス
   - type: web
     name: laravel-api
-    env: php
+    runtime: php
     plan: starter
     buildCommand: |
       composer install --no-dev --optimize-autoloader
@@ -43,7 +43,7 @@ services:
       - key: DB_USERNAME
         fromDatabase:
           name: laravel-db
-          property: username
+          property: user
       - key: DB_PASSWORD
         fromDatabase:
           name: laravel-db
