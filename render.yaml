@@ -3,7 +3,7 @@ services:
   - type: web
     name: laravel-api
     plan: free
-    runtime: php82
+    runtime: php81
     buildCommand: |
       composer install --no-dev --optimize-autoloader
       php artisan key:generate
