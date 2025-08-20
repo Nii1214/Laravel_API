@@ -19,14 +19,23 @@ return [
 
     'allowed_methods' => ['*'],
 
-    'allowed_origins' => [
+    'allowed_origins' => array_filter([
+        // ローカル開発環境
         'http://localhost:3000',
         'http://127.0.0.1:3000',
         'http://localhost:3001',
         'http://127.0.0.1:3001',
-    ],
 
-    'allowed_origins_patterns' => [],
+        // 本番環境（Render側の環境変数から取得）
+        env('FRONTEND_URL'),
+    ]),
+
+    'allowed_origins_patterns' => [
+        // Vercel のパターン（任意のサブドメインを許可）
+        '/^https:\/\/.*\.vercel\.app$/',
+        // Netlify のパターン（任意のサブドメインを許可）
+        '/^https:\/\/.*\.netlify\.app$/',
+    ],
 
     'allowed_headers' => [
         'Accept',
