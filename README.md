@@ -34,7 +34,7 @@ Laravel Sanctumを使用。
 
 ### アクセスURL
 - **Laravel アプリケーション**: http://localhost:8000
-- **PhpMyAdmin**: http://localhost:8080
+- **pgAdmin**: http://localhost:8080
 
 ```bash
 # 全テスト実行

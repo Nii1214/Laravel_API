@@ -19,6 +19,7 @@ RUN mkdir -p /var/www/storage /var/www/bootstrap/cache \
     && chmod -R 755 /var/www/storage /var/www/bootstrap/cache
 
 # .env をコピー（APP_KEY は Render の環境変数で上書き）
+# 本番環境では環境変数で上書きされるため、最小限の設定のみ
 COPY .env.example .env
 
 # composer.json と composer.lock をコピーして依存関係インストール
